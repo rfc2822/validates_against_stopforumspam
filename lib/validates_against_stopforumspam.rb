@@ -13,8 +13,8 @@ module ValidatesAgainstStopForumSpam
 			validate options do |comment|
 				query_options = []
 				attr_names.each do |param,attr_name|
-					if comment.has_attribute? attr_name
-						value = comment.read_attribute attr_name
+					if comment.respond_to? attr_name
+						value = comment.send attr_name
 						query_options << "#{param}=#{URI.escape(value)}" unless value.nil?
 					end
 				end

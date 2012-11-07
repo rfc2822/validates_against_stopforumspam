@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    validates_against_stopforumspam (1.0)
+    validates_against_stopforumspam (1.1)
       rails (> 3.0)
 
 GEM
