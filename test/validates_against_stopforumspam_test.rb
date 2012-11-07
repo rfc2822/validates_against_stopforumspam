@@ -1,6 +1,10 @@
 require 'test_helper'
 
 class ValidatesAgainstStopforumspamTest < ActiveSupport::TestCase
+  setup do
+    Rails.env = 'production'
+  end
+
   test "ham email" do
 		assert Comment.new(:email => 'surely@not-spam-but-ham.com').valid?
   end

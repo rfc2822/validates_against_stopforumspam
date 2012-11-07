@@ -21,14 +21,18 @@ module ValidatesAgainstStopForumSpam
 				return if query_options.empty?
 
 				url = "http://www.stopforumspam.com/api?" + query_options.join('&')
-				logger.info "Querying StopForumSpam: #{url}"
-				begin
-					response = Hash.from_xml(Net::HTTP.get(URI.parse(url)))
-					logger.debug response.inspect
-					errors.add :base, :spam_according_to_stopforumspam if [ response["response"]["appears"] ].flatten.include?("yes")
-				rescue StandardError => e
-					logger.warn "Couldn't validate against StopForumSpam: + #{e.message}"
-				end
+        if Rails.env.production?
+          logger.info "Querying StopForumSpam: #{url}"
+          begin
+            response = Hash.from_xml(Net::HTTP.get(URI.parse(url)))
+            logger.debug response.inspect
+            errors.add :base, :spam_according_to_stopforumspam if [ response["response"]["appears"] ].flatten.include?("yes")
+          rescue StandardError => e
+            logger.warn "Couldn't validate against StopForumSpam: + #{e.message}"
+          end
+        else
+          logger.info "Would query StopForumSpam: #{url} in production mode"
+        end
 			end
 		end
 	end
