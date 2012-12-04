@@ -24,9 +24,15 @@ module ValidatesAgainstStopForumSpam
         if Rails.env.production?
           logger.info "Querying StopForumSpam: #{url}"
           begin
-            response = Hash.from_xml(Net::HTTP.get(URI.parse(url)))
-            logger.debug response.inspect
+            uri = URI.parse(url)
+            http = Net::HTTP.new(uri.host)
+            http.open_timeout = 2
+            http.read_timeout = 2
+            raw_response = http.get("#{uri.path}?#{uri.query}")
+            response = Hash.from_xml(raw_response.body)
             errors.add :base, :spam_according_to_stopforumspam if [ response["response"]["appears"] ].flatten.include?("yes")
+          rescue TimeoutError
+            logger.warn "StopForumSpam request timed out"
           rescue StandardError => e
             logger.warn "Couldn't validate against StopForumSpam: + #{e.message}"
           end
